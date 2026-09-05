@@ -1,0 +1,25 @@
+{
+  "name": "collaboration-engine",
+  "version": "1.0.0",
+  "description": "Industry-grade distributed collaboration platform",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "turbo typecheck"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@11.25.0",
+  "type": "module",
+  "devDependencies": {
+    "prettier": "^3.6.2",
+    "turbo": "^2.10.12",
+    "typescript": "^7.0.2"
+  }
+}
