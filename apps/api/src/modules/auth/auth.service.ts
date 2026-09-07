@@ -1,6 +1,8 @@
 import { prisma } from '@collaboration-engine/database';
 import { hashPassword } from './password.service.js';
 import type { RegisterInput } from './auth.schema.js';
+import { createRefreshToken } from './refresh-token.service.js';
+
 
 export async function registerUser(input: RegisterInput) {
     const email = input.email.trim().toLowerCase();
@@ -44,49 +46,50 @@ import { createAccessToken } from './token.service.js';
 import type { LoginInput } from './auth.schema.js';
 
 export async function loginUser(input: LoginInput) {
-  const email = input.email.trim().toLowerCase();
+    const email = input.email.trim().toLowerCase();
 
-  const user = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
+    const user = await prisma.user.findUnique({
+        where: {
+            email,
+        },
+    });
 
-  if (!user) {
-    throw new Error('INVALID_CREDENTIALS');
-  }
+    if (!user) {
+        throw new Error('INVALID_CREDENTIALS');
+    }
 
-  const passwordValid = await verifyPassword(
-    input.password,
-    user.passwordHash,
-  );
+    const passwordValid = await verifyPassword(
+        input.password,
+        user.passwordHash,
+    );
 
-  if (!passwordValid) {
-    throw new Error('INVALID_CREDENTIALS');
-  }
+    if (!passwordValid) {
+        throw new Error('INVALID_CREDENTIALS');
+    }
 
-  if (user.status !== 'ACTIVE') {
-    throw new Error('ACCOUNT_NOT_ACTIVE');
-  }
+    if (user.status !== 'ACTIVE') {
+        throw new Error('ACCOUNT_NOT_ACTIVE');
+    }
 
-  const accessToken = await createAccessToken(user.id);
+    const accessToken = await createAccessToken(user.id);
+    const refreshToken = await createRefreshToken(user.id);
+    await prisma.user.update({
+        where: {
+            id: user.id,
+        },
+        data: {
+            lastLoginAt: new Date(),
+        },
+    });
 
-  await prisma.user.update({
-    where: {
-      id: user.id,
-    },
-    data: {
-      lastLoginAt: new Date(),
-    },
-  });
-
-  return {
-    accessToken,
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      status: user.status,
-    },
-  };
+    return {
+        accessToken,
+        refreshToken,
+        user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            status: user.status,
+        },
+    };
 }

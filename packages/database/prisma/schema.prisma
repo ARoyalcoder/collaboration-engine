@@ -60,10 +60,10 @@ model User {
 
   assignedTasks Task[] @relation("TaskAssignedTo")
 
+  refreshTokens RefreshToken[]
+
   @@map("users")
 }
-
-
 
 model Organization {
   id        String   @id @default(uuid())
@@ -92,10 +92,6 @@ model Workspace {
   @@map("workspaces")
 }
 
-
-
-
-
 model WorkspaceMember {
   id          String        @id @default(uuid())
   workspaceId String
@@ -105,8 +101,7 @@ model WorkspaceMember {
   updatedAt   DateTime      @updatedAt
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([workspaceId, userId])
   @@index([userId])
@@ -125,8 +120,7 @@ model Project {
   updatedAt   DateTime      @updatedAt
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-
-  createdBy User @relation("ProjectCreatedBy", fields: [createdById], references: [id])
+  createdBy User      @relation("ProjectCreatedBy", fields: [createdById], references: [id])
 
   tasks Task[]
 
@@ -149,11 +143,9 @@ model Task {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  createdBy User @relation("TaskCreatedBy", fields: [createdById], references: [id])
-
-  assignedTo User? @relation("TaskAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy  User    @relation("TaskCreatedBy", fields: [createdById], references: [id])
+  assignedTo User?   @relation("TaskAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
 
   @@index([projectId])
   @@index([assignedToId])
@@ -161,4 +153,19 @@ model Task {
   @@index([status])
   @@index([dueDate])
   @@map("tasks")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
 }

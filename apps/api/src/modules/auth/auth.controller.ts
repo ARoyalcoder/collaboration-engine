@@ -1,6 +1,8 @@
 import type { Request, Response } from 'express';
 import { registerSchema } from './auth.schema.js';
 import { registerUser } from './auth.service.js';
+import { refreshAccessToken } from './refresh-token.service.js';
+import { revokeRefreshToken } from './refresh-token.service.js';
 
 export async function registerController(
     req: Request,
@@ -121,4 +123,89 @@ export function meController(
     res.status(200).json({
         user: req.user,
     });
+}
+
+
+
+export async function refreshController(
+    req: Request,
+    res: Response,
+): Promise<void> {
+    const refreshToken = req.body?.refreshToken;
+
+    if (
+        typeof refreshToken !== 'string' ||
+        refreshToken.length === 0
+    ) {
+        res.status(400).json({
+            error: {
+                code: 'INVALID_REFRESH_TOKEN',
+                message: 'Refresh token is required',
+            },
+        });
+
+        return;
+    }
+
+    try {
+        const result = await refreshAccessToken(refreshToken);
+
+        res.status(200).json(result);
+    } catch (error) {
+        if (
+            error instanceof Error &&
+            error.message === 'INVALID_REFRESH_TOKEN'
+        ) {
+            res.status(401).json({
+                error: {
+                    code: 'INVALID_REFRESH_TOKEN',
+                    message: 'Invalid or expired refresh token',
+                },
+            });
+
+            return;
+        }
+
+        if (
+            error instanceof Error &&
+            error.message === 'ACCOUNT_NOT_ACTIVE'
+        ) {
+            res.status(403).json({
+                error: {
+                    code: 'ACCOUNT_NOT_ACTIVE',
+                    message: 'This account is not active',
+                },
+            });
+
+            return;
+        }
+
+        throw error;
+    }
+}
+
+
+export async function logoutController(
+    req: Request,
+    res: Response,
+): Promise<void> {
+    const refreshToken = req.body?.refreshToken;
+
+    if (
+        typeof refreshToken !== 'string' ||
+        refreshToken.length === 0
+    ) {
+        res.status(400).json({
+            error: {
+                code: 'INVALID_REFRESH_TOKEN',
+                message: 'Refresh token is required',
+            },
+        });
+
+        return;
+    }
+
+    await revokeRefreshToken(refreshToken);
+
+    res.status(204).send();
 }
