@@ -3,6 +3,7 @@ import authRouter from '../modules/auth/auth.routes.js';
 import workspaceRouter from '../modules/workspaces/workspace.routes.js';
 import memberRouter from '../modules/members/member.routes.js';
 import projectRouter from '../modules/projects/project.routes.js';
+import taskRouter from '../modules/tasks/task.routes.js';
 
 
 const router = Router();
@@ -17,4 +18,6 @@ router.use('/auth', authRouter);
 router.use('/workspaces', workspaceRouter);
 router.use('/workspaces', memberRouter);
 router.use('/workspaces', projectRouter);
+router.use('/workspaces', taskRouter);
+
 export default router;
