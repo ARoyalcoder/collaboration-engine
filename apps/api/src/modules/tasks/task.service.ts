@@ -2,6 +2,7 @@ import { prisma } from '@collaboration-engine/database';
 import type {
     CreateTaskInput,
     ListTasksQuery,
+    UpdateTaskInput,
 } from './task.schema.js';
 
 async function verifyProject(
@@ -74,7 +75,7 @@ export async function createTask(
             dueDate: input.dueDate ?? null,
         },
 
-        select: {   
+        select: {
             id: true,
             projectId: true,
             title: true,
@@ -212,4 +213,137 @@ export async function getTask(
     }
 
     return task;
+}
+
+export async function updateTask(
+    workspaceId: string,
+    projectId: string,
+    taskId: string,
+    input: UpdateTaskInput,
+) {
+    const existingTask = await prisma.task.findFirst({
+        where: {
+            id: taskId,
+            projectId,
+            project: {
+                workspaceId,
+            },
+        },
+        select: {
+            id: true,
+            projectId: true,
+        },
+    });
+
+    if (!existingTask) {
+        throw new Error('TASK_NOT_FOUND');
+    }
+
+    if (input.assignedToId) {
+        const membership =
+            await prisma.workspaceMember.findUnique({
+                where: {
+                    workspaceId_userId: {
+                        workspaceId,
+                        userId: input.assignedToId,
+                    },
+                },
+                select: {
+                    userId: true,
+                },
+            });
+
+        if (!membership) {
+            throw new Error(
+                'ASSIGNEE_NOT_IN_WORKSPACE',
+            );
+        }
+    }
+
+    const task = await prisma.task.update({
+        where: {
+            id: taskId,
+        },
+
+        data: {
+            ...(input.title !== undefined && {
+                title: input.title,
+            }),
+
+            ...(input.description !== undefined && {
+                description: input.description,
+            }),
+
+            ...(input.status !== undefined && {
+                status: input.status === 'IN_REVIEW'
+                    ? 'REVIEW'
+                    : input.status,
+            }),
+
+            ...(input.priority !== undefined && {
+                priority: input.priority,
+            }),
+
+            ...(input.assignedToId !== undefined && {
+                assignedTo:
+                    input.assignedToId === null
+                        ? { disconnect: true }
+                        : {
+                            connect: {
+                                id: input.assignedToId,
+                            },
+                        },
+            }),
+
+            ...(input.dueDate !== undefined && {
+                dueDate: input.dueDate,
+            }),
+        },
+
+        select: {
+            id: true,
+            projectId: true,
+            title: true,
+            description: true,
+            status: true,
+            priority: true,
+            assignedToId: true,
+            createdById: true,
+            dueDate: true,
+            version: true,
+            createdAt: true,
+            updatedAt: true,
+        },
+    });
+
+    return task;
+}
+
+export async function deleteTask(
+  workspaceId: string,
+  projectId: string,
+  taskId: string,
+) {
+  const existingTask = await prisma.task.findFirst({
+    where: {
+      id: taskId,
+      projectId,
+      project: {
+        workspaceId,
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!existingTask) {
+    throw new Error('TASK_NOT_FOUND');
+  }
+
+  await prisma.task.delete({
+    where: {
+      id: taskId,
+    },
+  });
 }

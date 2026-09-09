@@ -2,11 +2,14 @@ import type { Request, Response } from 'express';
 import {
   createTaskSchema,
   listTasksQuerySchema,
+  updateTaskSchema,
 } from './task.schema.js';
 import {
   createTask,
+  deleteTask,
   getTask,
   listTasks,
+  updateTask,
 } from './task.service.js';
 
 export async function createTaskController(
@@ -27,8 +30,8 @@ export async function createTaskController(
     }
 
     const task = await createTask(
-      req.params.workspaceId as string ,
-      req.params.projectId as string ,
+      req.params.workspaceId as string,
+      req.params.projectId as string,
       req.user.id,
       input,
     );
@@ -86,7 +89,7 @@ export async function getTaskController(
 ): Promise<void> {
   try {
     const task = await getTask(
-      req.params.workspaceId    as string,
+      req.params.workspaceId as string,
       req.params.projectId as string,
       req.params.taskId as string,
     );
@@ -94,6 +97,90 @@ export async function getTaskController(
     res.status(200).json({
       data: task,
     });
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === 'TASK_NOT_FOUND'
+    ) {
+      res.status(404).json({
+        error: {
+          code: 'TASK_NOT_FOUND',
+          message: 'Task not found',
+        },
+      });
+      return;
+    }
+
+    throw error;
+  }
+}
+
+
+export async function updateTaskController(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  try {
+    const input = updateTaskSchema.parse(
+      req.body,
+    );
+
+    const task = await updateTask(
+      req.params.workspaceId as string,
+      req.params.projectId as string,
+      req.params.taskId as string,
+      input,
+    );
+
+    res.status(200).json({
+      data: task,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      if (
+        error.message === 'TASK_NOT_FOUND'
+      ) {
+        res.status(404).json({
+          error: {
+            code: 'TASK_NOT_FOUND',
+            message: 'Task not found',
+          },
+        });
+        return;
+      }
+
+      if (
+        error.message ===
+        'ASSIGNEE_NOT_IN_WORKSPACE'
+      ) {
+        res.status(400).json({
+          error: {
+            code: 'ASSIGNEE_NOT_IN_WORKSPACE',
+            message:
+              'Assignee is not a member of this workspace',
+          },
+        });
+        return;
+      }
+    }
+
+    throw error;
+  }
+}
+
+
+export async function deleteTaskController(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  try {
+    await deleteTask(
+      req.params.workspaceId as string,
+      req.params.projectId as string,
+      req.params.taskId as string,
+    );
+
+    res.status(204).send();
   } catch (error) {
     if (
       error instanceof Error &&

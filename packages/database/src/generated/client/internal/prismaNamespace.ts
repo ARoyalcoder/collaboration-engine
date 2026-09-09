@@ -403,7 +403,8 @@ export const ModelName = {
   WorkspaceMember: 'WorkspaceMember',
   Project: 'Project',
   Task: 'Task',
-  RefreshToken: 'RefreshToken'
+  RefreshToken: 'RefreshToken',
+  TaskComment: 'TaskComment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "organization" | "workspace" | "workspaceMember" | "project" | "task" | "refreshToken"
+    modelProps: "user" | "organization" | "workspace" | "workspaceMember" | "project" | "task" | "refreshToken" | "taskComment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -885,6 +886,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TaskComment: {
+      payload: Prisma.$TaskCommentPayload<ExtArgs>
+      fields: Prisma.TaskCommentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TaskCommentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskCommentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TaskCommentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskCommentPayload>
+        }
+        findFirst: {
+          args: Prisma.TaskCommentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskCommentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TaskCommentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskCommentPayload>
+        }
+        findMany: {
+          args: Prisma.TaskCommentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskCommentPayload>[]
+        }
+        create: {
+          args: Prisma.TaskCommentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskCommentPayload>
+        }
+        createMany: {
+          args: Prisma.TaskCommentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.TaskCommentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskCommentPayload>
+        }
+        update: {
+          args: Prisma.TaskCommentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskCommentPayload>
+        }
+        deleteMany: {
+          args: Prisma.TaskCommentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TaskCommentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.TaskCommentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskCommentPayload>
+        }
+        aggregate: {
+          args: Prisma.TaskCommentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTaskComment>
+        }
+        groupBy: {
+          args: Prisma.TaskCommentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TaskCommentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TaskCommentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TaskCommentCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1015,6 +1082,18 @@ export const RefreshTokenScalarFieldEnum = {
 export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
 
 
+export const TaskCommentScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  userId: 'userId',
+  content: 'content',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TaskCommentScalarFieldEnum = (typeof TaskCommentScalarFieldEnum)[keyof typeof TaskCommentScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1097,6 +1176,16 @@ export const RefreshTokenOrderByRelevanceFieldEnum = {
 } as const
 
 export type RefreshTokenOrderByRelevanceFieldEnum = (typeof RefreshTokenOrderByRelevanceFieldEnum)[keyof typeof RefreshTokenOrderByRelevanceFieldEnum]
+
+
+export const TaskCommentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  userId: 'userId',
+  content: 'content'
+} as const
+
+export type TaskCommentOrderByRelevanceFieldEnum = (typeof TaskCommentOrderByRelevanceFieldEnum)[keyof typeof TaskCommentOrderByRelevanceFieldEnum]
 
 
 
@@ -1325,6 +1414,7 @@ export type GlobalOmitConfig = {
   project?: Prisma.ProjectOmit
   task?: Prisma.TaskOmit
   refreshToken?: Prisma.RefreshTokenOmit
+  taskComment?: Prisma.TaskCommentOmit
 }
 
 /* Types for Logging */

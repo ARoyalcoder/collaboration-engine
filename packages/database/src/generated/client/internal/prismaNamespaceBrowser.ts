@@ -57,7 +57,8 @@ export const ModelName = {
   WorkspaceMember: 'WorkspaceMember',
   Project: 'Project',
   Task: 'Task',
-  RefreshToken: 'RefreshToken'
+  RefreshToken: 'RefreshToken',
+  TaskComment: 'TaskComment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -167,6 +168,18 @@ export const RefreshTokenScalarFieldEnum = {
 export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
 
 
+export const TaskCommentScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  userId: 'userId',
+  content: 'content',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TaskCommentScalarFieldEnum = (typeof TaskCommentScalarFieldEnum)[keyof typeof TaskCommentScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -249,4 +262,14 @@ export const RefreshTokenOrderByRelevanceFieldEnum = {
 } as const
 
 export type RefreshTokenOrderByRelevanceFieldEnum = (typeof RefreshTokenOrderByRelevanceFieldEnum)[keyof typeof RefreshTokenOrderByRelevanceFieldEnum]
+
+
+export const TaskCommentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  userId: 'userId',
+  content: 'content'
+} as const
+
+export type TaskCommentOrderByRelevanceFieldEnum = (typeof TaskCommentOrderByRelevanceFieldEnum)[keyof typeof TaskCommentOrderByRelevanceFieldEnum]
 

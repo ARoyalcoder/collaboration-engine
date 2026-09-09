@@ -52,3 +52,8 @@ export type Task = Prisma.TaskModel
  * 
  */
 export type RefreshToken = Prisma.RefreshTokenModel
+/**
+ * Model TaskComment
+ * 
+ */
+export type TaskComment = Prisma.TaskCommentModel

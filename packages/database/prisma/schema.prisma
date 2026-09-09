@@ -55,12 +55,11 @@ model User {
   workspaceMemberships WorkspaceMember[]
 
   createdProjects Project[] @relation("ProjectCreatedBy")
-
-  createdTasks Task[] @relation("TaskCreatedBy")
-
-  assignedTasks Task[] @relation("TaskAssignedTo")
+  createdTasks    Task[]    @relation("TaskCreatedBy")
+  assignedTasks   Task[]    @relation("TaskAssignedTo")
 
   refreshTokens RefreshToken[]
+  taskComments  TaskComment[]
 
   @@map("users")
 }
@@ -147,6 +146,8 @@ model Task {
   createdBy  User    @relation("TaskCreatedBy", fields: [createdById], references: [id])
   assignedTo User?   @relation("TaskAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
 
+  comments TaskComment[]
+
   @@index([projectId])
   @@index([assignedToId])
   @@index([createdById])
@@ -168,4 +169,20 @@ model RefreshToken {
   @@index([userId])
   @@index([expiresAt])
   @@map("refresh_tokens")
+}
+
+model TaskComment {
+  id        String   @id @default(uuid())
+  taskId    String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([userId])
+  @@map("task_comments")
 }

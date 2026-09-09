@@ -4,7 +4,7 @@ import workspaceRouter from '../modules/workspaces/workspace.routes.js';
 import memberRouter from '../modules/members/member.routes.js';
 import projectRouter from '../modules/projects/project.routes.js';
 import taskRouter from '../modules/tasks/task.routes.js';
-
+import commentRouter from '../modules/comments/comment.routes.js';
 
 const router = Router();
 
@@ -19,5 +19,5 @@ router.use('/workspaces', workspaceRouter);
 router.use('/workspaces', memberRouter);
 router.use('/workspaces', projectRouter);
 router.use('/workspaces', taskRouter);
-
+router.use('/workspaces', commentRouter);
 export default router;

@@ -4,7 +4,7 @@ import { notFoundHandler } from './middleware/not-found.js';
 import { errorHandler } from './middleware/error-handler.js'; 
 
 import cors from 'cors';
-
+import { prisma } from '../../../packages/database/src/client.js';
 
 const app = express();
 
@@ -14,10 +14,24 @@ app.use(
     credentials: true,
   }),
 );
+
+
+app.patch('/tasks/:id', async (req, res) => {
+  await prisma.task.update({
+    where: {
+      id: req.params.id,
+    },
+    data: req.body,
+  });
+});
+
+
+
 app.use(express.json());
 
 app.use('/api/v1', apiRouter);
   
 app.use(notFoundHandler);
 app.use(errorHandler);
+
 export default app;
