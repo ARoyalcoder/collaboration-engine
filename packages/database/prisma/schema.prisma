@@ -186,3 +186,56 @@ model TaskComment {
   @@index([userId])
   @@map("task_comments")
 }
+
+enum ActivityEntityType {
+  WORKSPACE
+  PROJECT
+  TASK
+  COMMENT
+  MEMBER
+}
+
+enum ActivityAction {
+  WORKSPACE_CREATED
+  WORKSPACE_UPDATED
+  WORKSPACE_DELETED
+
+  MEMBER_ADDED
+  MEMBER_REMOVED
+  MEMBER_ROLE_CHANGED
+
+  PROJECT_CREATED
+  PROJECT_UPDATED
+  PROJECT_DELETED
+
+  TASK_CREATED
+  TASK_UPDATED
+  TASK_DELETED
+
+  COMMENT_CREATED
+  COMMENT_UPDATED
+  COMMENT_DELETED
+}
+
+model ActivityLog {
+  id          String             @id @default(uuid())
+  workspaceId String
+  userId      String
+  action      ActivityAction
+  entityType  ActivityEntityType
+  entityId    String
+  metadata    Json?
+  createdAt   DateTime           @default(now())
+
+  user User @relation(
+    fields: [userId],
+    references: [id],
+    onDelete: Cascade
+  )
+
+  @@index([workspaceId, createdAt])
+  @@index([userId, createdAt])
+  @@index([entityType, entityId])
+  @@index([action, createdAt])
+  @@map("activity_logs")
+}
