@@ -86,3 +86,8 @@ export type TaskComment = Prisma.TaskCommentModel
  * 
  */
 export type ActivityLog = Prisma.ActivityLogModel
+/**
+ * Model Attachment
+ * 
+ */
+export type Attachment = Prisma.AttachmentModel

@@ -59,7 +59,8 @@ export const ModelName = {
   Task: 'Task',
   RefreshToken: 'RefreshToken',
   TaskComment: 'TaskComment',
-  ActivityLog: 'ActivityLog'
+  ActivityLog: 'ActivityLog',
+  Attachment: 'Attachment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -195,6 +196,20 @@ export const ActivityLogScalarFieldEnum = {
 export type ActivityLogScalarFieldEnum = (typeof ActivityLogScalarFieldEnum)[keyof typeof ActivityLogScalarFieldEnum]
 
 
+export const AttachmentScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  uploadedById: 'uploadedById',
+  fileName: 'fileName',
+  storageKey: 'storageKey',
+  contentType: 'contentType',
+  size: 'size',
+  createdAt: 'createdAt'
+} as const
+
+export type AttachmentScalarFieldEnum = (typeof AttachmentScalarFieldEnum)[keyof typeof AttachmentScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -322,4 +337,16 @@ export const ActivityLogOrderByRelevanceFieldEnum = {
 } as const
 
 export type ActivityLogOrderByRelevanceFieldEnum = (typeof ActivityLogOrderByRelevanceFieldEnum)[keyof typeof ActivityLogOrderByRelevanceFieldEnum]
+
+
+export const AttachmentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  uploadedById: 'uploadedById',
+  fileName: 'fileName',
+  storageKey: 'storageKey',
+  contentType: 'contentType'
+} as const
+
+export type AttachmentOrderByRelevanceFieldEnum = (typeof AttachmentOrderByRelevanceFieldEnum)[keyof typeof AttachmentOrderByRelevanceFieldEnum]
 

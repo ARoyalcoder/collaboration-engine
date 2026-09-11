@@ -42,6 +42,36 @@ enum TaskPriority {
   URGENT
 }
 
+enum ActivityEntityType {
+  WORKSPACE
+  PROJECT
+  TASK
+  COMMENT
+  MEMBER
+}
+
+enum ActivityAction {
+  WORKSPACE_CREATED
+  WORKSPACE_UPDATED
+  WORKSPACE_DELETED
+
+  MEMBER_ADDED
+  MEMBER_REMOVED
+  MEMBER_ROLE_CHANGED
+
+  PROJECT_CREATED
+  PROJECT_UPDATED
+  PROJECT_DELETED
+
+  TASK_CREATED
+  TASK_UPDATED
+  TASK_DELETED
+
+  COMMENT_CREATED
+  COMMENT_UPDATED
+  COMMENT_DELETED
+}
+
 model User {
   id           String     @id @default(uuid())
   name         String
@@ -55,11 +85,17 @@ model User {
   workspaceMemberships WorkspaceMember[]
 
   createdProjects Project[] @relation("ProjectCreatedBy")
-  createdTasks    Task[]    @relation("TaskCreatedBy")
-  assignedTasks   Task[]    @relation("TaskAssignedTo")
+
+  createdTasks  Task[] @relation("TaskCreatedBy")
+  assignedTasks Task[] @relation("TaskAssignedTo")
 
   refreshTokens RefreshToken[]
-  taskComments  TaskComment[]
+
+  taskComments TaskComment[]
+
+  activityLogs ActivityLog[] @relation("UserActivityLogs")
+
+  attachments Attachment[] @relation("UserAttachments")
 
   @@map("users")
 }
@@ -100,7 +136,8 @@ model WorkspaceMember {
   updatedAt   DateTime      @updatedAt
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([workspaceId, userId])
   @@index([userId])
@@ -119,7 +156,8 @@ model Project {
   updatedAt   DateTime      @updatedAt
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  createdBy User      @relation("ProjectCreatedBy", fields: [createdById], references: [id])
+
+  createdBy User @relation("ProjectCreatedBy", fields: [createdById], references: [id])
 
   tasks Task[]
 
@@ -142,11 +180,15 @@ model Task {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdBy  User    @relation("TaskCreatedBy", fields: [createdById], references: [id])
-  assignedTo User?   @relation("TaskAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdBy User @relation("TaskCreatedBy", fields: [createdById], references: [id])
+
+  assignedTo User? @relation("TaskAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
 
   comments TaskComment[]
+
+  attachments Attachment[] @relation("TaskAttachments")
 
   @@index([projectId])
   @@index([assignedToId])
@@ -180,41 +222,12 @@ model TaskComment {
   updatedAt DateTime @updatedAt
 
   task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([taskId])
   @@index([userId])
   @@map("task_comments")
-}
-
-enum ActivityEntityType {
-  WORKSPACE
-  PROJECT
-  TASK
-  COMMENT
-  MEMBER
-}
-
-enum ActivityAction {
-  WORKSPACE_CREATED
-  WORKSPACE_UPDATED
-  WORKSPACE_DELETED
-
-  MEMBER_ADDED
-  MEMBER_REMOVED
-  MEMBER_ROLE_CHANGED
-
-  PROJECT_CREATED
-  PROJECT_UPDATED
-  PROJECT_DELETED
-
-  TASK_CREATED
-  TASK_UPDATED
-  TASK_DELETED
-
-  COMMENT_CREATED
-  COMMENT_UPDATED
-  COMMENT_DELETED
 }
 
 model ActivityLog {
@@ -227,15 +240,30 @@ model ActivityLog {
   metadata    Json?
   createdAt   DateTime           @default(now())
 
-  user User @relation(
-    fields: [userId],
-    references: [id],
-    onDelete: Cascade
-  )
+  user User @relation("UserActivityLogs", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([workspaceId, createdAt])
   @@index([userId, createdAt])
   @@index([entityType, entityId])
   @@index([action, createdAt])
   @@map("activity_logs")
+}
+
+model Attachment {
+  id           String   @id @default(uuid())
+  taskId       String
+  uploadedById String
+  fileName     String
+  storageKey   String   @unique
+  contentType  String
+  size         Int
+  createdAt    DateTime @default(now())
+
+  task Task @relation("TaskAttachments", fields: [taskId], references: [id], onDelete: Cascade)
+
+  uploadedBy User @relation("UserAttachments", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([uploadedById])
+  @@map("attachments")
 }
