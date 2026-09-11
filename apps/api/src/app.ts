@@ -4,7 +4,7 @@ import { notFoundHandler } from './middleware/not-found.js';
 import { errorHandler } from './middleware/error-handler.js'; 
 
 import cors from 'cors';
-import { prisma } from '../../../packages/database/src/client.js';
+import { prisma } from '@collaboration-engine/database';
 
 const app = express();
 

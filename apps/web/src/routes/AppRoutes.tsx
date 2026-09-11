@@ -8,8 +8,8 @@ import {
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import DashboardPage from '../pages/DashboardPage';
-
 import ProtectedRoute from '../features/auth/ProtectedRoute';
+import WorkspacePage from '../features/workspaces/WorkspacePage';
 
 export default function AppRoutes() {
     return (
@@ -39,6 +39,11 @@ export default function AppRoutes() {
                     <Route
                         path="/dashboard"
                         element={<DashboardPage />}
+                    />
+
+                    <Route
+                        path="/workspaces/:workspaceId"
+                        element={<WorkspacePage />}
                     />
                 </Route>
             </Routes>
