@@ -16,7 +16,7 @@ app.use(
 );
 
 
-app.patch('/tasks/:id', async (req, res) => {
+app.patch('/tasks/:id', async (req) => {
   await prisma.task.update({
     where: {
       id: req.params.id,
