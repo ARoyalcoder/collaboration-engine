@@ -7,6 +7,8 @@ import {
 
 import { useAuth } from '../auth/AuthContext';
 import { getTask } from './task.service';
+import { joinTask, leaveTask, socket } from '../../services/socket';
+import type { CommentDeletedEvent, CommentEventComment } from '@collaboration-engine/shared';
 import type { Task } from './task.types';
 
 export default function TaskPage() {
@@ -26,11 +28,17 @@ export default function TaskPage() {
   const [task, setTask] =
     useState<Task | null>(null);
 
+  const [comments, setComments] =
+    useState<CommentEventComment[]>([]);
+
   const [loading, setLoading] =
     useState(true);
 
   const [error, setError] =
     useState<string | null>(null);
+
+  const [refreshKey, setRefreshKey] =
+    useState(0);
 
   useEffect(() => {
     if (
@@ -72,6 +80,80 @@ export default function TaskPage() {
     accessToken,
   ]);
 
+  useEffect(() => {
+    if (!task || !workspaceId || !projectId || !taskId) {
+      return;
+    }
+
+    void joinTask(
+      workspaceId,
+      projectId,
+      taskId,
+    );
+
+    return () => {
+      leaveTask(taskId);
+    };
+  }, [
+    task,
+    workspaceId,
+    projectId,
+    taskId,
+  ]);
+
+  useEffect(() => {
+    const handleCommentCreated = () => {
+      setRefreshKey((value) => value + 1);
+    };
+
+    const handleCommentUpdated = () => {
+      setRefreshKey((value) => value + 1);
+    };
+
+    const handleCommentDeleted = (
+      event: CommentDeletedEvent,
+    ) => {
+      setComments((current) =>
+        current.filter(
+          (comment) =>
+            comment.id !== event.commentId,
+        ),
+      );
+    };
+
+    socket.on(
+      'comment.created',
+      handleCommentCreated,
+    );
+
+    socket.on(
+      'comment.updated',
+      handleCommentUpdated,
+    );
+
+    socket.on(
+      'comment.deleted',
+      handleCommentDeleted,
+    );
+
+    return () => {
+      socket.off(
+        'comment.created',
+        handleCommentCreated,
+      );
+
+      socket.off(
+        'comment.updated',
+        handleCommentUpdated,
+      );
+
+      socket.off(
+        'comment.deleted',
+        handleCommentDeleted,
+      );
+    };
+  }, []);
+
   if (loading) {
     return <p>Loading task...</p>;
   }
@@ -97,7 +179,7 @@ export default function TaskPage() {
   }
 
   return (
-    <main>
+    <main key={refreshKey}>
       <button
         onClick={() =>
           navigate(
@@ -143,6 +225,22 @@ export default function TaskPage() {
       <p>
         Version: {task.version}
       </p>
+
+      {comments.length > 0 && (
+        <section>
+          <h2>Comments ({comments.length})</h2>
+          <ul>
+            {comments.map((comment) => (
+              <li key={comment.id}>
+                <p>{comment.content}</p>
+                <small>
+                  {new Date(comment.createdAt).toLocaleString()}
+                </small>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </main>
   );
 }

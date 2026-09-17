@@ -24,29 +24,39 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!selectedWorkspace || !accessToken) {
-      setMembers([]);
       return;
     }
 
     const token = accessToken;
     const currentWorkspaceId = selectedWorkspace.id;
+    let isCancelled = false;
 
     async function loadMembers() {
       setMembersLoading(true);
       setMembersError(null);
       try {
         const data = await listMembers(currentWorkspaceId, token);
-        setMembers(data);
+        if (!isCancelled) {
+          setMembers(data);
+        }
       } catch (err) {
-        setMembersError(
-          err instanceof Error ? err.message : 'Unable to load members',
-        );
+        if (!isCancelled) {
+          setMembersError(
+            err instanceof Error ? err.message : 'Unable to load members',
+          );
+        }
       } finally {
-        setMembersLoading(false);
+        if (!isCancelled) {
+          setMembersLoading(false);
+        }
       }
     }
 
     loadMembers();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [selectedWorkspace, accessToken]);
 
   return (

@@ -134,7 +134,7 @@ export async function updateComment(
     taskId,
   );
 
-  const comment =
+  const existingComment =
     await prisma.taskComment.findFirst({
       where: {
         id: commentId,
@@ -147,39 +147,24 @@ export async function updateComment(
       },
     });
 
-  if (!comment) {
+  if (!existingComment) {
     throw new Error('COMMENT_NOT_FOUND');
   }
 
-  if (comment.userId !== userId) {
+  if (existingComment.userId !== userId) {
     throw new Error('COMMENT_FORBIDDEN');
   }
 
-  return prisma.taskComment.update({
+  const comment = await prisma.taskComment.update({
     where: {
       id: commentId,
     },
-
     data: {
       content: input.content,
     },
-
-    select: {
-      id: true,
-      taskId: true,
-      userId: true,
-      content: true,
-      createdAt: true,
-      updatedAt: true,
-
-      user: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
   });
+
+  return comment;
 }
 
 

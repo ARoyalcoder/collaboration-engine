@@ -48,7 +48,7 @@ export default function WorkspaceList({
     }
 
     loadWorkspaces();
-  }, [accessToken]);
+  }, [accessToken, onSelectWorkspace, onWorkspacesLoaded, selectedWorkspaceId]);
 
   if (loading) {
     return <div className="loading-spinner">Loading workspaces...</div>;

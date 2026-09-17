@@ -8,6 +8,7 @@ import {
 
 import type { LoginInput, User } from './auth.types';
 import * as authService from './auth.service';
+import { connectSocket, disconnectSocket } from '../../services/socket';
 
 type AuthContextValue = {
   user: User | null;
@@ -32,14 +33,26 @@ export function AuthProvider({
   const [accessToken, setAccessToken] =
     useState<string | null>(null);
 
-  async function login(input: LoginInput) {
-    const result = await authService.login(input);
+  async function login(
+    input: LoginInput,
+  ) {
+    const result =
+      await authService.login(input);
 
-    setAccessToken(result.accessToken);
+    setAccessToken(
+      result.accessToken,
+    );
+
     setUser(result.user);
+
+    connectSocket(
+      result.accessToken,
+    );
   }
 
   function logout() {
+    disconnectSocket();
+
     setAccessToken(null);
     setUser(null);
   }
@@ -62,6 +75,7 @@ export function AuthProvider({
   );
 }
 
+/* eslint-disable-next-line react-refresh/only-export-components */
 export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
 
@@ -72,4 +86,4 @@ export function useAuth(): AuthContextValue {
   }
 
   return context;
-}
+}

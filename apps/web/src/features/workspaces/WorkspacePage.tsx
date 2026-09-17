@@ -9,7 +9,9 @@ import {
     getWorkspace,
     listMembers,
 } from './workspace.service';
- 
+import {
+    joinWorkspace,
+} from '../../services/socket';
 import type {
     Workspace,
     WorkspaceMember,
@@ -45,6 +47,16 @@ export default function WorkspacePage() {
 
         async function loadWorkspace() {
             try {
+                const joinResult =
+                    await joinWorkspace(workspaceId as string );
+
+                if (!joinResult.success) {
+                    throw new Error(
+                        joinResult.message ??
+                        'Unable to join workspace',
+                    );
+                }
+
                 const [
                     workspaceData,
                     membersData,
