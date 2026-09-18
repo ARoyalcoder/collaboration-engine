@@ -15,6 +15,7 @@ import {
 import { canAccessProject } from '../authorization/project-access.service.js';
 import { projectJoinSchema, taskJoinSchema, workspaceJoinSchema } from './socket.schema.js';
 import { canAccessTask } from '../authorization/task-access.service.js';
+import { presenceManager } from '../presence/presence.events.js';
 
 export function registerSocketHandlers(
 
@@ -81,7 +82,12 @@ export function registerSocketHandlers(
           );
 
         await socket.join(room);
-
+        presenceManager.joinWorkspace(
+          validWorkspaceId,
+          socket.data.user.id,
+          socket.id,
+        );
+        
         callback?.({
           success: true,
         });
@@ -250,7 +256,3 @@ export function registerSocketHandlers(
     },
   );
 }
-
-
-
-

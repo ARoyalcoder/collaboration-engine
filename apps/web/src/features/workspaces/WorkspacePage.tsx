@@ -16,6 +16,8 @@ import type {
     Workspace,
     WorkspaceMember,
 } from './workspace.types';
+import { PresenceList } from '../presence/PresenceList';
+import { usePresence } from '../presence/usePresence';
 
 export default function WorkspacePage() {
     const { workspaceId } = useParams<{
@@ -38,6 +40,10 @@ export default function WorkspacePage() {
     const [error, setError] =
         useState<string | null>(null);
 
+    const onlineUsers =
+        usePresence(workspaceId as string );
+
+
     useEffect(() => {
         if (!workspaceId || !accessToken) {
             return;
@@ -48,7 +54,7 @@ export default function WorkspacePage() {
         async function loadWorkspace() {
             try {
                 const joinResult =
-                    await joinWorkspace(workspaceId as string );
+                    await joinWorkspace(workspaceId as string);
 
                 if (!joinResult.success) {
                     throw new Error(
@@ -122,6 +128,8 @@ export default function WorkspacePage() {
             </button>
 
             <h1>{workspace.name}</h1>
+
+            <PresenceList users={onlineUsers} />
 
             <section>
                 <h2>Members</h2>
