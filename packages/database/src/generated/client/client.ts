@@ -81,3 +81,13 @@ export type RefreshToken = Prisma.RefreshTokenModel
  * 
  */
 export type TaskComment = Prisma.TaskCommentModel
+/**
+ * Model ActivityLog
+ * 
+ */
+export type ActivityLog = Prisma.ActivityLogModel
+/**
+ * Model Attachment
+ * 
+ */
+export type Attachment = Prisma.AttachmentModel

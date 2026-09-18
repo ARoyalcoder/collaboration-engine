@@ -2,9 +2,8 @@ import express from 'express';
 import apiRouter from './routes/index.js';
 import { notFoundHandler } from './middleware/not-found.js';
 import { errorHandler } from './middleware/error-handler.js'; 
-
 import cors from 'cors';
-import { prisma } from '../../../packages/database/src/client.js';
+import { prisma } from '@collaboration-engine/database';
 
 const app = express();
 
@@ -16,7 +15,7 @@ app.use(
 );
 
 
-app.patch('/tasks/:id', async (req, res) => {
+app.patch('/tasks/:id', async (req) => {
   await prisma.task.update({
     where: {
       id: req.params.id,
@@ -30,7 +29,6 @@ app.patch('/tasks/:id', async (req, res) => {
 app.use(express.json());
 
 app.use('/api/v1', apiRouter);
-  
 app.use(notFoundHandler);
 app.use(errorHandler);
 

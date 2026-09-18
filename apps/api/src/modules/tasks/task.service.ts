@@ -63,48 +63,21 @@ export async function createTask(
         );
     }
 
-    const task = await prisma.task.create({
-        data: {
-            projectId,
-            title: input.title,
-            description: input.description ?? null,
-            status: input.status === 'IN_REVIEW' ? 'REVIEW' : input.status,
-            priority: input.priority,
-            assignedToId: input.assignedToId ?? null,
-            createdById: userId,
-            dueDate: input.dueDate ?? null,
-        },
-
-        select: {
-            id: true,
-            projectId: true,
-            title: true,
-            description: true,
-            status: true,
-            priority: true,
-            assignedToId: true,
-            createdById: true,
-            dueDate: true,
-            version: true,
-            createdAt: true,
-            updatedAt: true,
-
-            createdBy: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                },
+    const task = await prisma.$transaction(async (tx) => {
+        const createdTask = await tx.task.create({
+            data: {
+                projectId,
+                title: input.title,
+                description: input.description,
+                status: input.status === 'IN_REVIEW' ? ('REVIEW' as const) : input.status,
+                priority: input.priority,
+                assignedToId: input.assignedToId,
+                createdById: userId,
+                dueDate: input.dueDate,
             },
+        });
 
-            assignedTo: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                },
-            },
-        },
+        return createdTask;
     });
 
     return task;
@@ -347,3 +320,7 @@ export async function deleteTask(
     },
   });
 }
+
+ 
+
+ 
